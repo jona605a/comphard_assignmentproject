@@ -1,11 +1,12 @@
 use std::io;
-use std::vec::{Vec};
+use std::vec::Vec;
 use union_find::{QuickFindUf, QuickUnionUf, UnionBySize, UnionFind};
+
 
 fn read_int(input : &mut String) -> usize{
     *input = "".to_string();
     
-    io::stdin().read_line(input);
+    let _ = io::stdin().read_line(input);
     return input.trim().parse::<usize>().unwrap();
 }
 
@@ -28,7 +29,7 @@ fn minium_spanning_tree(graph : &mut Vec<Vec<(usize,usize)>>, edges : &Vec<(usiz
 
     let mut u = QuickUnionUf::<UnionBySize>::new(graph.len());
 
-    for (x,y,w,i) in edges{
+    for (x,y,_,i) in edges{
         if u.find(*x) != u.find(*y){
             u.union(*x, *y);
             edges_in_st.push(*i);
@@ -65,7 +66,7 @@ fn remove_edges(edges : &Vec<(usize,usize,usize,usize)>, edge_max : usize, mirro
 
 
 
-fn minimum_mirror_spanning_tree(graph : &mut Vec<Vec<(usize,usize)>>, edges : &Vec<(usize, usize, usize, usize)>) -> (){
+fn minimum_mirror_spanning_tree(graph : &mut Vec<Vec<(usize,usize)>>, edges : &Vec<(usize, usize, usize, usize)>) -> () {
 
     let mut edges_sorted_by_weight = edges.clone();
     let mut edges_sorted_by_mirror_weight = edges.clone();
