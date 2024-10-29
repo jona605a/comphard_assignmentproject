@@ -5,3 +5,12 @@ version = 3
 [[package]]
 name = "code"
 version = "0.1.0"
+dependencies = [
+ "union-find",
+]
+
+[[package]]
+name = "union-find"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "039142448432983c34b64739f8526f8f233a1eec7a66e61b6ab29acfa781194e"
