@@ -14,7 +14,7 @@ fn read_line_of_ints(input : &mut String) -> Vec<usize>{
     *input = "".to_string();
     
     io::stdin().read_line(input).unwrap();
-    input.split(" ").map(|number| {number.trim().parse::<usize>().unwrap()}).collect()
+    input.trim().split(" ").map(|number| {number.trim().parse::<usize>().unwrap()}).collect()
 }
 
 
@@ -24,13 +24,11 @@ fn minium_spanning_tree(graph : &mut Vec<Vec<(usize,usize)>>, edges : &Vec<(usiz
 
     let n = graph.len() - 1;
     let m = edges.len();
-    let mut edges_clone = edges.clone();
-    edges_clone.sort_by(|(_,_,w1,_),(_,_,w2,_)| {w1.cmp(w2)});
     let mut edges_in_st = Vec::new();
 
     let mut u = QuickUnionUf::<UnionBySize>::new(graph.len());
 
-    for (x,y,w,i) in &edges_clone{
+    for (x,y,w,i) in edges{
         if u.find(*x) != u.find(*y){
             u.union(*x, *y);
             edges_in_st.push(*i);
@@ -47,35 +45,6 @@ fn minium_spanning_tree(graph : &mut Vec<Vec<(usize,usize)>>, edges : &Vec<(usiz
 
 }
 
-
-
-fn minimum_mirror_spanning_tree(graph : &mut Vec<Vec<(usize,usize)>>, edges : &Vec<(usize, usize, usize, usize)>) -> Result<(Vec<usize>,usize,usize),String>{
-
-
-    let n = graph.len() - 1;
-    let m = edges.len();
-    let mut edges_clone = edges.clone();
-    edges_clone.sort_by(|(_,_,_,i1),(_,_,_,i2)| {edges[m-i1].2.cmp(&edges[m-i2].2)});
-    let mut edges_in_st = Vec::new();
-
-    let mut u = QuickUnionUf::<UnionBySize>::new(graph.len());
-
-    for (x,y,w,i) in &edges_clone{
-        if u.find(*x) != u.find(*y){
-            u.union(*x, *y);
-            edges_in_st.push(*i);
-            if edges_in_st.len() == n-1{
-                let mirror_sum : usize = edges_in_st.iter().map(|x| {edges[*x-1].2}).sum(); 
-                let minimum_st_sum : usize = edges_in_st.iter().map(|x| {edges[m-*x].2}).sum(); 
-                return Ok((edges_in_st,minimum_st_sum,mirror_sum))
-            }
-        }
-    }
-
-
-    Err("No spanning tree".to_string())
-
-}
 
 
 fn remove_edges(edges : &Vec<(usize,usize,usize,usize)>, edge_max : usize, mirror_max : usize) -> Vec<(usize,usize,usize,usize)>{
@@ -96,6 +65,14 @@ fn remove_edges(edges : &Vec<(usize,usize,usize,usize)>, edge_max : usize, mirro
 
 
 
+fn minimum_mirror_spanning_tree(graph : &mut Vec<Vec<(usize,usize)>>, edges : &Vec<(usize, usize, usize, usize)>) -> (){
+
+    let mut edges_sorted_by_weight = edges.clone();
+    let mut edges_sorted_by_mirror_weight = edges.clone();
+    let mut edges_sorted_by_sum_of_weights = edges.clone();
+}
+
+
 fn main() {
     let mut input_string = String::new();
 
@@ -113,9 +90,12 @@ fn main() {
         graph[line[0]].push((line[1],line[2]));
     }
 
+
+    let mut sorted_edges = edges_with_order.clone();
+    sorted_edges.sort_by(|e1,e2| {e1.2.cmp(&e2.2)});
+
     println!("{:?}",edges_with_order);
-    minium_spanning_tree(&mut graph, &edges_with_order);
-    println!("{:?}",minimum_mirror_spanning_tree(&mut graph, &edges_with_order));
+    println!("{:?}",minium_spanning_tree(&mut graph, &sorted_edges).unwrap());
     
 }
 
