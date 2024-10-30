@@ -80,7 +80,7 @@ fn brute_force(
     edges: &Vec<(usize, usize, usize, usize)>,
     spanning_tree: &mut DynamicGraph,
     spanning_tree_edge_set : &mut Set,
-    filtered_edges: &Vec<bool>,
+    blacklisted_edges: &Vec<bool>,
     index: usize,
     n : usize
 ) -> (usize, Set) {
@@ -92,18 +92,18 @@ fn brute_force(
     }
 
     if index > m+1-(n-1) + spanning_tree_edge_set.len(){
-        return (usize::MAX,spanning_tree_edge_set.clone());
+        return (usize::MAX,Set::new(0));
     }
 
 
-    let result_without_index = brute_force(edges, spanning_tree, spanning_tree_edge_set, filtered_edges, index + 1,n);
+    let result_without_index = brute_force(edges, spanning_tree, spanning_tree_edge_set, blacklisted_edges, index + 1,n);
 
     let (v,w) = (VertexIndex(edges[index].0),VertexIndex(edges[index].1));
 
-    if !spanning_tree.is_connected(v,w) && !filtered_edges[index]{
+    if !spanning_tree.is_connected(v,w) && !blacklisted_edges[index]{
         let edge = spanning_tree.insert_edge(v,w).unwrap();
         spanning_tree_edge_set.insert(index);
-        let result_with_index = brute_force(edges, spanning_tree, spanning_tree_edge_set, filtered_edges, index+1, n);
+        let result_with_index = brute_force(edges, spanning_tree, spanning_tree_edge_set, blacklisted_edges, index+1, n);
         spanning_tree.delete_edge(edge);
         spanning_tree_edge_set.remove(&index);
         if result_with_index.0 <= result_without_index.0 {
