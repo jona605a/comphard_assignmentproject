@@ -5,3 +5,5 @@ edition = "2021"
 
 [dependencies]
 union-find = "0.4.3"
+fastset = "0.4.1"
+outils = "0.3.0"
