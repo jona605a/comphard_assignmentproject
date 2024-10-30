@@ -1,12 +1,11 @@
 use fastset::{set, Set};
 use outils::prelude::DynamicConnectivity;
 use outils::types::{Edge, Edges};
-use std::borrow::BorrowMut;
 use std::vec::Vec;
 use std::{cmp::max, io};
 use union_find::{QuickFindUf, QuickUnionUf, UnionBySize, UnionFind};
-use outils::graph::dynconn::{hdt::DynamicGraph};
-use outils::prelude::{VertexIndex};
+use outils::graph::dynconn::hdt::DynamicGraph;
+use outils::prelude::VertexIndex;
 
 fn read_int(input: &mut String) -> usize {
     *input = "".to_string();
@@ -60,7 +59,7 @@ fn find_locked_edges(graph: &mut Vec<Vec<usize>>, degrees: &mut Vec<usize>, edge
     let mut locked_edges = Set::new(edges.len()-1);
    
 
-    while true{
+    loop{
         let edge_set_size_before = locked_edges.len();
 
         for i in 1..edges.len(){
@@ -75,10 +74,6 @@ fn find_locked_edges(graph: &mut Vec<Vec<usize>>, degrees: &mut Vec<usize>, edge
             return locked_edges;
         }
     }
-
-    
-
-    return locked_edges;
 }
 
 fn brute_force(
@@ -132,7 +127,7 @@ fn minimum_mirror_spanning_tree(
     let mut edges_sorted_by_mirror_weight = edges.clone();
 
     edges_sorted_by_weight.sort_by(|edge_i, edge_j| edge_i.2.cmp(&edge_j.2));
-    println!("{:?}",edges_sorted_by_weight);
+    println!("Edges sorted: {:?}",edges_sorted_by_weight);
     // edges_sorted_by_mirror_weight
     //     .sort_by(|edge_i, edge_j| edges[edge_i.3 - 1].2.cmp(&edges[edge_j.3 - 1].2));
 
@@ -151,18 +146,16 @@ fn minimum_mirror_spanning_tree(
         blacklisted_edges[*index] = true;
     }
 
-    println!("{:?}",locked_edges);
+    println!("Locked edges (edge idx): {:?}",locked_edges);
 
-    return Ok(brute_force(
+    Ok(brute_force(
         edges,
         &mut DynamicGraph::new(graph.len(),100),
         &mut locked_edges,
         &blacklisted_edges,
         1,
         graph.len()-1,
-    ));
-
-    return Err("NO".to_string());
+    ))
 }
 
 fn main() {
@@ -173,7 +166,7 @@ fn main() {
 
     let mut edges_with_order = Vec::from([(0, 0, 0, 0)]);
     let mut graph: Vec<Vec<usize>> = (0..n + 1).map(|_| Vec::new()).collect();
-    let mut degrees = vec![0;m+1];
+    let mut degrees = vec![0;n+1];
 
     for i in 0..m {
         let line = read_line_of_ints(&mut input_string);
