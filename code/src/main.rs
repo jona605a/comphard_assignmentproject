@@ -97,7 +97,7 @@ fn brute_force(
     }
 
     if index > m+1-(n-1) + spanning_tree_edge_set.len(){
-        return (usize::MAX,spanning_tree_edge_set.clone());
+        return (usize::MAX,Set::new(0));
     }
 
 
