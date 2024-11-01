@@ -1,12 +1,10 @@
-use fastset::{set, Set};
-use outils::graph;
-use outils::prelude::DynamicConnectivity;
-use outils::types::{Edge, Edges, EmptyWeight};
-use std::vec::Vec;
-use std::{cmp::max, io};
-use union_find::{QuickFindUf, QuickUnionUf, UnionBySize, UnionFind};
+use fastset::Set;
 use outils::graph::dynconn::hdt::DynamicGraph;
+use outils::prelude::DynamicConnectivity;
 use outils::prelude::VertexIndex;
+use outils::types::EmptyWeight;
+use std::{cmp::max, io, vec::Vec};
+use union_find::{QuickUnionUf, UnionBySize, UnionFind};
 
 fn read_int(input: &mut String) -> usize {
     *input = "".to_string();
@@ -57,28 +55,26 @@ fn minium_spanning_tree(
     Err("No spanning tree".to_string())
 }
 
-fn find_locked_edges(edges: &Vec<(usize, usize, usize, usize)>, n : usize) -> Set{
-    let mut locked_edges = Set::new(edges.len()-1);
-    let mut graph : DynamicGraph<EmptyWeight> = DynamicGraph::new(n+1, 100);
-    let vertices : Vec<VertexIndex> = (0..n+1).map(|x| {VertexIndex(x)}).collect();
+fn find_locked_edges(edges: &Vec<(usize, usize, usize, usize)>, n: usize) -> Set {
+    let mut locked_edges = Set::new(edges.len() - 1);
+    let mut graph: DynamicGraph<EmptyWeight> = DynamicGraph::new(n + 1, 100);
+    let vertices: Vec<VertexIndex> = (0..n + 1).map(|x| VertexIndex(x)).collect();
     let mut edges_in_graph = vec![];
 
-
-    for (v,w,_,_) in &edges[1..edges.len()]{
+    for (v, w, _, _) in &edges[1..edges.len()] {
         edges_in_graph.push(graph.insert_edge(vertices[*v], vertices[*w]).unwrap());
     }
-    println!("{:?}",edges_in_graph.len());
+    println!("{:?}", edges_in_graph.len());
 
-    for i in 0..edges_in_graph.len(){
+    for i in 0..edges_in_graph.len() {
         graph.delete_edge(edges_in_graph[i]);
-        if !graph.is_connected(vertices[edges[i+1].0], vertices[edges[i+1].1]){
-            locked_edges.insert(i+1);
+        if !graph.is_connected(vertices[edges[i + 1].0], vertices[edges[i + 1].1]) {
+            locked_edges.insert(i + 1);
         }
-        graph.insert_edge(vertices[edges[i+1].0], vertices[edges[i+1].1]);
+        graph.insert_edge(vertices[edges[i + 1].0], vertices[edges[i + 1].1]);
     }
 
     return locked_edges;
-
 }
 
 fn brute_force(
@@ -128,29 +124,25 @@ fn minimum_mirror_spanning_tree(
     n: usize,
 ) -> Result<(usize, Set), String> {
     let mut edges_sorted_by_weight = edges.clone();
-    let mut edges_sorted_by_mirror_weight = edges.clone();
+    // let mut edges_sorted_by_mirror_weight = edges.clone();
 
     edges_sorted_by_weight.sort_by(|edge_i, edge_j| edge_i.2.cmp(&edge_j.2));
     println!("Edges sorted: {:?}",edges_sorted_by_weight);
     // edges_sorted_by_mirror_weight
     //     .sort_by(|edge_i, edge_j| edges[edge_i.3 - 1].2.cmp(&edges[edge_j.3 - 1].2));
 
-    let (spanning_tree, tree_weight, mirror_weight,max_tree_edge,max_mirror_edge) = match minium_spanning_tree(edges, &edges_sorted_by_weight,n) {
-        Err(s) => return Err(s),
-        Ok((spanning_tree, spanning_tree_weigth, mirror_weigth,max_tree_edge, max_mirror_edge)) => {
-            (spanning_tree, spanning_tree_weigth, mirror_weigth,max_tree_edge, max_mirror_edge)
-        }
-    };
+    // If no spanning tree exists, there is no solution. If the mst function returns an error, the ? operator here also returns that error. 
+    let (spanning_tree, tree_weight, mirror_weight,_max_tree_edge,_max_mirror_edge) = minium_spanning_tree(edges, &edges_sorted_by_weight,n)?; 
 
-    println!("{:?} {:?} {:?}",tree_weight,mirror_weight,spanning_tree);
+    println!("MST: {:?} {:?} {:?}",tree_weight,mirror_weight,spanning_tree);
     let mut blacklisted_edges = (0..edges.len()).map(|_| false).collect::<Vec<bool>>();
     let mut locked_edges = find_locked_edges(edges,n);
+    // The DynamicGraph structure supports very fast (log²n) dynamic connectivity
     let mut graph = DynamicGraph::new(n+1,100);
 
     for index in &locked_edges{
         blacklisted_edges[*index] = true;
         graph.insert_edge(VertexIndex(edges[*index].0), VertexIndex(edges[*index].1));
-        
     }
 
     println!("Locked edges (edge idx): {:?}",locked_edges);
