@@ -1,0 +1,23 @@
+\section*{f) The algorithm}
+
+In this description of our algorithm we will not go into the details of our implementation as this can be seen in our code. We also won't cover basic details like reading input or specific data structures. For a spanning tree $ST$ we will denote the sum $\sum_{e_i \in ST} w(e_i) $ as $W(ST)$ and the sum $\sum_{e_i\in ST}w(e_{m+1-i})$ as $WM(ST)$. 
+
+\begin{enumerate}
+    \item Attempt to find a minium spanning tree $MST$ of $G$. If this is not possible then return NO as $G$ has no spanning tree. Otherwise check if $WM(ST) \leq W(ST)$. If this is true then return $(W(ST),ST)$ as this is optimal.
+    \item Find a spanning tree $MMST$ where $WM(MMST)$ is minimum. If $W(MMST) \leq WM(MMST)$ return $(WM(MMST),MMST)$ as this is optimal.
+    \item Set $ST = \empty$. Now go through each edge $e$ in $G$. Remove $e$ from $G$. If this disconnects $G$ then add $e$ to $ST$. then add $e$ back to $G$.
+    \item Set $E = E \backslash ST$
+    \item Choose an edge $e$ in $E$. Now return BruteForce($ST,G,e$)
+\end{enumerate}
+
+The subroutine BruteForce is described below
+
+\begin{algorithm}[H]
+\caption{BruteForce($ST,G$)}\label{alg:bruteforce}
+\begin{algorithmic}
+
+\State 
+
+\end{algorithmic}
+\end{algorithm}
+

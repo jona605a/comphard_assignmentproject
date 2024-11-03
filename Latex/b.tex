@@ -1,0 +1,9 @@
+\section*{b) The word problem}
+
+In order to describe the formal language that is used in the \texttt{.uwg} file format and to solve the word problem, the alphabet and the language must first be defined. 
+
+The alphabet is $\Sigma_{MFMST}=\{0,1,\dotsc,9,SPACE,LF\}$, where "SPACE"\ is the blank symbol and "LF"\ is the line-feed symbol. 
+
+The language $L_{MFMST,B}$ consists of all inputs whose graph has a mirror-friendly minimum spanning tree $T$ with a mirror $M$ with $max\{|T|,|M|\}\leq B$. In other words, the language is the set of all inputs for which the output is "YES". 
+
+In order to solve the word problem, the problem will be broken into steps. Firstly, the input word $w$ will be read and parsed as a graph, as described in the problem statement. Then some algorithm can be used to give a heuristic of which edges must be or must not be in the optimal solution. Then, check all spanning trees until one with $max\{|T|,|M|\}\leq B$ is satisfied. Then output "YES". If no solution exists, output "NO". 

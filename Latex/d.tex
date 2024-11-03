@@ -1,0 +1,12 @@
+\section*{d) MFMST in in $\mathcal{NP}$}
+
+To prove that MFMST is in $\mathcal{NP}$ we will design an algorithm which takes the problem instance $\mathbf{X}$ and a random sequence $R$ and solves the decision problem. This random sequence $R$ consists of integers in the range $[1,m]$. Our algorithm is as follows
+
+\begin{enumerate}
+    \item Consider $R=r_1,r_2\dots r_k$. If $k < n-1$ return NO.
+    Otherwise check if the set $ST = \{e_{r_1},e_{r_2}\dots e_{r_{n-1}}\}$ is a spanning tree. If it is not return NO.
+    \item Now check if $\sum_{i=1}^{n-1}w(e_{r_i}) \leq B \land \sum_{i=1}^{n-1}w(e_{m+1-r_i}) \leq B$. If this is true return YES otherwise return NO.
+\end{enumerate}
+
+This clearly runs in polynomial time. We check if something is a spanning tree which can be done in linear time with for example BFS and then we compute two sums. If the answer to the MFMST problem is NO then there exists no set $ST$ that is both a spanning tree and satisfies $\sum_{i=1}^{n-1}w_{r_i} \leq B \land \sum_{i=1}^{n-1}w_{m+1-r_i} \leq B$. Therefore our algorithm will also answer NO either in step 1 or step 2. If the answer to the MFMST problem is YES then there must exists at least on set $ST$ which is a solution to the problem. Since we uniformly at random draw a set of numbers in range $[1,m]$ of at most size $n-1$, we draw from a finite set of possibilities. Therefore the probability of drawing $ST$ from a finite set of possibilities is positive.\\
+So we have a deterministic algorithm which takes $\mathbf{X}$ and a random sequence $R$ as inputs which when the true answer is NO answers NO for all $R$. When the true answer is YES there exists a polynomial size $R$ where the algorithm will answer YES. Therefore MFMST is in $\mathcal{NP}$. 
