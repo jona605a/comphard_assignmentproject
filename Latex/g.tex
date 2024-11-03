@@ -1,0 +1,14 @@
+\section*{g) Analysis of runtime}
+
+The analysis of the runtime is done in three steps, the check, the filtering step and the brute-force step. 
+
+The check is parts 1. and 2. in the algorithm. The edges are sorted in $O(m\log m)$ time and then a minimum spanning tree is found using Kruskal's algorithm. This is repeated where the edges are sorted by their mirror's weight. In total, this takes $O(m\log m)$ time. 
+
+The filtering step is polynomial in runtime. Here, for each edge in the graph, the edge is removed and a connectivity check is made, after which the edge is put back. The connectivity check is done in $O(log^2(n))$ time. In total, this step takes $O(m\log^2(n))$ time. 
+
+The brute force step is the part taking non-polynomial time. Here, the recursive function \texttt{brute_force} is used. To analyze the running time of this algorithm, consider the tree of recursive calls to the function, see figure . 
+
+
+
+
+
