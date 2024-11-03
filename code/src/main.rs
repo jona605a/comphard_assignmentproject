@@ -1,8 +1,8 @@
+#![allow(non_snake_case)]
 use fastset::Set;
 use outils::graph::dynconn::hdt::DynamicGraph;
 use outils::prelude::DynamicConnectivity;
 use outils::prelude::VertexIndex;
-use outils::tree;
 use outils::types::EmptyWeight;
 use std::{cmp::max, io, vec::Vec};
 use union_find::{QuickUnionUf, UnionBySize, UnionFind};
@@ -178,7 +178,7 @@ fn minimum_mirror_spanning_tree(
     // The DynamicGraph structure supports very fast (log²n) dynamic connectivity
     let mut graph = DynamicGraph::new(n + 1, 100);
 
-    for (v, w, weight, i) in &edges_with_order[1..m] {
+    for (v, w, weight, i) in &edges_with_order[1..m+1] {
         if locked_edges.contains(i) {
             graph.insert_edge(VertexIndex(*v), VertexIndex(*w));
             continue;
@@ -186,13 +186,12 @@ fn minimum_mirror_spanning_tree(
         filtered_edges.push((*v, *w, *weight, *i));
     }
 
-
     Ok(brute_force(
         edges_with_order,
         &mut graph,
         &mut locked_edges,
         &filtered_edges,
-        1,
+        0,
         n,
     ))
 }
@@ -212,7 +211,7 @@ fn main() {
     }
 
     match minimum_mirror_spanning_tree(&edges_with_order, n) {
-        Err(s) => println!("NO"),
+        Err(_) => println!("NO"),
         Ok((B, spanning_tree)) => {
             for i in spanning_tree {
                 println!("{:?}", i);
