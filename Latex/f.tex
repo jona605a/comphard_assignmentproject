@@ -3,11 +3,11 @@
 In this description of our algorithm we will not go into the details of our implementation as this can be seen in our code. We also won't cover basic details like reading input or specific data structures. For a spanning tree $ST$ we will denote the sum $\sum_{e_i \in ST} w(e_i) $ as $W(ST)$ and the sum $\sum_{e_i\in ST}w(e_{m+1-i})$ as $WM(ST)$. 
 
 \begin{enumerate}
-    \item Attempt to find a minium spanning tree $MST$ of $G$. If this is not possible then return NO as $G$ has no spanning tree. Otherwise check if $WM(ST) \leq W(ST)$. If this is true then return $(W(ST),ST)$ as this is optimal.
-    \item Find a spanning tree $MMST$ where $WM(MMST)$ is minimum. If $W(MMST) \leq WM(MMST)$ return $(WM(MMST),MMST)$ as this is optimal.
-    \item Set $ST = \empty$. Now go through each edge $e$ in $G$. Remove $e$ from $G$. If this disconnects $G$ then add $e$ to $ST$. then add $e$ back to $G$.
-    \item Set $E = E \backslash ST$
-    \item Choose an edge $e$ in $E$. Now return BruteForce($ST,G,e$)
+    \item Attempt to find a minimum spanning tree $MST$ of $G$. If this is not possible then return NO as $G$ has no spanning tree. Otherwise check if $WM(ST) \leq W(ST)$. If this is true then return $(W(ST),ST)$ as this is optimal.
+    \item Find a spanning tree $MMST$ where $WM(MMST)$ is minimum. If $W(MMST) \leq \\WM(MMST)$ return $(WM(MMST),MMST)$ as this is optimal.
+    \item Set $ST = \emptyset$. Now go through each edge $e$ in $G$. Remove $e$ from $G$. If this disconnects $G$ then add $e$ to $ST$. Then add $e$ back to $G$.
+    \item Set $E = E \setminus ST$
+    \item Now return BruteForce($ST,G$)
 \end{enumerate}
 
 The subroutine BruteForce is described below
@@ -15,9 +15,25 @@ The subroutine BruteForce is described below
 \begin{algorithm}[H]
 \caption{BruteForce($ST,G$)}\label{alg:bruteforce}
 \begin{algorithmic}
-
-\State 
-
+\If{$|ST| = n-1$}
+    \State return $(\max(W(ST),WM(ST)),ST)$
+\EndIf
+\If{$n-1 - |ST| < |E|$}
+    \State return $(\infty,\emptyset)$
+\EndIf
+\State Choose an edge $e$ in $E$
+\State Set $E = E\backslash \{e\}$
+\State $(B_{\backslash e},ST_{\backslash e}) \leftarrow$ BruteForce($ST,G$)
+\If{$ST \cup \{e\}$ contains no cycles}
+    \State $ST = ST \cup \{e\}$
+    \State $(B_{e},ST_{e}) \leftarrow$ BruteForce($ST,G$) 
+    \If{$B_{e} \geq B_{\backslash e}$}
+        \State return $(B_e,ST_e)$
+    \EndIf
+\EndIf
+\State return $(B_{\backslash e},ST_{\backslash e})$
 \end{algorithmic}
 \end{algorithm}
+
+The first part of our algorithm first deals with the two edge cases where an optimal solution is simple by finding two spanning trees which are minimum with respect to the weight of tree and the weight mirror respectively. This also checks if a spanning tree exists. We then find all bridges in the graph. Every such edge is part of every spanning tree in $G$ and so we immediately add them to $ST$. Finally the BruteForce subroutine finds the $B$ value for all possible spanning trees and returns the smallest. This is done by choosing an edge $e \in E$ and then recursively calculating all spanning trees not containing $e$ and then all spanning tree containing $e$. 
 

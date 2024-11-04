@@ -3,7 +3,7 @@
 The algorithm we have described and analysis up to this point has been implemented in the programming language Rust and run on test cases 1 through 5. One advantage of the Rust implementation was the \texttt{DynamicGraph} and \texttt{DynamicConnectivity} modules, giving an easy and very fast way to check handle dynamic connectivity in $O(\log^2(n))$ update time. 
 
 For the five first test cases, the optimal $B$ values found are shown in table \ref{tab:results}. For test case 6, it took more than 10 minutes to run, so it was aborted. 
-\begin{table}[h]
+\begin{table}[ht!]
     \centering
     \begin{tabular}{c|c}
         Test case & Optimal $B$ value \\\hline
@@ -17,3 +17,6 @@ For the five first test cases, the optimal $B$ values found are shown in table \
     \label{tab:results}
 \end{table}
 
+The corresponding spanning trees for these results can be obtained by running our code. 
+
+Finally, we have had many ideas for further implementation and improvements to the algorithm, in order to achieve faster results. And although these were unfortunately not a priority for us to have done in time, we are still satisfied with our final product. 
