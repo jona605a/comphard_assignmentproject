@@ -8,7 +8,7 @@ First we will show how we transform an input to PBP to an input to MFMST in poly
 \subsection*{Transformation: PBP $\rightarrow$ MFMST}
 For an input sequence of numbers to PBP $(s_1,s_2,\dots, s_{2n})$ we will look at the pair $(s_{2i-1},s_{2i})$. This we will model in our graph as seen below in figure \ref{fig:PBPToMFMST}.
 
-\begin{figure}[h]
+\begin{figure}[ht!]
     \centering
     \includegraphics[width=0.6\linewidth]{Latex/Billeder/PBPToMFMST.png}
     \caption{How $(s_{2i-1},s_{2i})$ is modeled in our graph input}
@@ -17,7 +17,7 @@ For an input sequence of numbers to PBP $(s_1,s_2,\dots, s_{2n})$ we will look a
 
 The module or subgraph shown in figure \ref{fig:PBPToMFMST} is repeated for each pair $(s_{2i-1},s_{2i})$ and these subgraphs are connected together. We will show how this is done for the example input to PBP $(1,4,5,8)$. This is seen in figure \ref{fig:PBPToMFMSTExample}. 
 
-\begin{figure}[h]
+\begin{figure}[ht!]
     \centering
     \includegraphics[width=0.6\linewidth]{Latex/Billeder/PBPToMFMSTExample.png}
     \caption{The MFMST transformation of the PBP input $(1,4,5,8)$}
