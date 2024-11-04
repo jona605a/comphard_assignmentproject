@@ -35,6 +35,7 @@ fn minium_spanning_tree(
 
     let mut u = QuickUnionUf::<UnionBySize>::new(n + 1);
 
+    // Simply use Kruskal's algorithm, using a QuickUnion data structure
     for (x, y, _, i) in &sorted_edges[1..m + 1] {
         if u.find(*x) != u.find(*y) {
             u.union(*x, *y);
@@ -55,25 +56,29 @@ fn minium_spanning_tree(
     Err("No spanning tree".to_string())
 }
 
-fn find_locked_edges(edges: &Vec<(usize, usize, usize, usize)>, n: usize) -> Set {
-    let mut locked_edges = Set::new(edges.len() - 1);
+fn find_bridges(edges: &Vec<(usize, usize, usize, usize)>, n: usize) -> Set {
+    let mut bridges = Set::new(edges.len() - 1);
     let mut graph: DynamicGraph<EmptyWeight> = DynamicGraph::new(n + 1, 100);
     let vertices: Vec<VertexIndex> = (0..n + 1).map(|x| VertexIndex(x)).collect();
     let mut edges_in_graph = vec![];
 
+    // Initialize the graph data structure from the given edges
+    // Along with a vector of edges in the graph
     for (v, w, _, _) in &edges[1..edges.len()] {
         edges_in_graph.push(graph.insert_edge(vertices[*v], vertices[*w]).unwrap());
     }
 
+    // Find all bridges
     for i in 0..edges_in_graph.len() {
         graph.delete_edge(edges_in_graph[i]);
+        // Definition of a bridge: an edge whose removal disconnects the graph
         if !graph.is_connected(vertices[edges[i + 1].0], vertices[edges[i + 1].1]) {
-            locked_edges.insert(i + 1);
+            bridges.insert(i + 1);
         }
         graph.insert_edge(vertices[edges[i + 1].0], vertices[edges[i + 1].1]);
     }
 
-    return locked_edges;
+    return bridges;
 }
 
 fn brute_force(
@@ -86,7 +91,8 @@ fn brute_force(
 ) -> (usize, Set) {
     let m = edges_with_order.len() - 1;
 
-    if spanning_tree_edge_set.len() == n - 1 { // We have a spanning tree so calculate B and return result
+    if spanning_tree_edge_set.len() == n - 1 {
+        // We have a spanning tree so calculate B and return result
         let (tree_weight, mirror_weight) =
             spanning_tree_edge_set.iter().fold((0, 0), |(tw, mw), i| {
                 (
@@ -100,14 +106,14 @@ fn brute_force(
         );
     }
 
-    // It is not possible to construct spanning tree with the current edge set 
+    // It is not possible to construct spanning tree with the current edge set
     // and the remaining number of edges
     if index > filtered_edges.len() - (n - 1) + spanning_tree_edge_set.len() {
         return (usize::MAX, Set::new(0));
     }
 
     let current_edge = edges_with_order[filtered_edges[index].3];
-    
+
     // Best B for spanning trees without the current edge
     let result_without_index = brute_force(
         edges_with_order,
@@ -121,7 +127,7 @@ fn brute_force(
     let (v, w) = (VertexIndex(current_edge.0), VertexIndex(current_edge.1));
 
     // If adding the current edge does not create a cycle then add it
-    // to the edge set and find the optimal spanning tree containing 
+    // to the edge set and find the optimal spanning tree containing
     // the current edge.
     if !spanning_tree.is_connected(v, w) {
         // Add the current edge
@@ -136,14 +142,12 @@ fn brute_force(
             n,
         );
 
-        // Remove the current edge agian. Necessary for future recursive calls.
+        // Remove the current edge again. Necessary for future recursive calls.
         spanning_tree.delete_edge(edge);
         spanning_tree_edge_set.remove(&current_edge.3);
 
         if result_with_index.0 <= result_without_index.0 {
             return result_with_index;
-        } else {
-            return result_without_index;
         }
     }
 
@@ -160,45 +164,52 @@ fn minimum_mirror_spanning_tree(
 
     edges_sorted_by_weight.sort_by(|edge_i, edge_j| edge_i.2.cmp(&edge_j.2));
 
-    edges_sorted_by_mirror_weight.remove(0); // Remove index fixer in order to sort
+    // Remove index fixer in order to sort
+    edges_sorted_by_mirror_weight.remove(0);
     edges_sorted_by_mirror_weight.sort_by(|edge_i, edge_j| {
         edges_with_order[m + 1 - edge_i.3]
             .2
             .cmp(&edges_with_order[m + 1 - edge_j.3].2)
     });
-    edges_sorted_by_mirror_weight.insert(0, (0, 0, 0, 0)); // Insert index fixer agian after sorting
+    // Insert index fixer agian after sorting
+    edges_sorted_by_mirror_weight.insert(0, (0, 0, 0, 0));
 
-    // If no spanning tree exists, there is no solution. If the mst function returns an error, the ? operator here also returns that error.
+    // Find a minimum spanning tree
+    // If the mst function returns an error, the ? operator here also returns that error.
     let (spanning_tree, tree_weight, mirror_weight) =
         minium_spanning_tree(edges_with_order, &edges_sorted_by_weight, n)?; // regular MST
 
-    if mirror_weight <= tree_weight { // MST is optimal
+    if mirror_weight <= tree_weight {
+        // MST is optimal
         return Ok((tree_weight, spanning_tree));
     };
 
     // Spanning tree where the weight of the mirror is minimum
     let (spanning_tree, tree_weight, mirror_weight) =
-        minium_spanning_tree(edges_with_order, &edges_sorted_by_mirror_weight, n)?;  
+        minium_spanning_tree(edges_with_order, &edges_sorted_by_mirror_weight, n)?;
 
-    if tree_weight <= mirror_weight { // Spanning tree where the weight of the mirror is minimum is optimal
+    if tree_weight <= mirror_weight {
+        // Spanning tree where the weight of the mirror is minimum is optimal
         return Ok((mirror_weight, spanning_tree));
     }
 
-    let mut locked_edges = find_locked_edges(edges_with_order, n); // Every bridge must be in every spanning tree
+    // Every bridge must be in every spanning tree, so find every bridge
+    let mut locked_edges = find_bridges(edges_with_order, n);
     let mut filtered_edges = vec![];
     // The DynamicGraph structure supports very fast (log²n) dynamic connectivity
     let mut graph = DynamicGraph::new(n + 1, 100);
 
     // Remove the locked edges and the index fixing edge from the set of edges
-    // we need to consider 
-    for (v, w, weight, i) in &edges_with_order[1..m+1] {
+    // we need to consider
+    for (v, w, weight, i) in &edges_with_order[1..m + 1] {
         if locked_edges.contains(i) {
             graph.insert_edge(VertexIndex(*v), VertexIndex(*w));
             continue;
         }
         filtered_edges.push((*v, *w, *weight, *i));
     }
-    // Brute force with the filtered edges
+
+    // Finally, Brute force with the filtered edges
     Ok(brute_force(
         edges_with_order,
         &mut graph,
@@ -211,20 +222,21 @@ fn minimum_mirror_spanning_tree(
 
 fn main() {
     let mut input_string = String::new();
-    // read inputs
+    // Read inputs
     let n = read_int(&mut input_string);
     let m = read_int(&mut input_string);
 
     let mut edges_with_order = Vec::from([(0, 0, 0, 0)]);
 
-    // construct edge vector
+    // Construct edge vector
     for i in 0..m {
         let line = read_line_of_ints(&mut input_string);
         let edge = (line[0], line[1], line[2], i + 1);
         edges_with_order.push(edge);
     }
 
-    match minimum_mirror_spanning_tree(&edges_with_order, n) { // solve optimization problem and print results
+    match minimum_mirror_spanning_tree(&edges_with_order, n) {
+        // Solve optimization problem and print results
         Err(_) => println!("NO"),
         Ok((B, spanning_tree)) => {
             for i in spanning_tree {
