@@ -1,0 +1,51 @@
+\section*{c) From decision variant to optimization variant}
+%We now assume that we have a polynomial time algorithm for the decision problem. From this we will construct an polynomial time algorithm for the optimization problem. The pseudo code is shown below
+
+We now assume that we have an algorithm for the decision problem where a call takes one computational step. From this we will construct an polynomial time algorithm for the optimization problem. The pseudo code is shown below
+
+\begin{algorithm}[H]
+\caption{Find the minimum mirror friendly spanning tree}\label{alg:spP}
+\begin{algorithmic}
+\State $B_{upper} \leftarrow \sum_{i=1}^m w(e_i)$
+\State $B_{lower} \leftarrow 0$
+\If{$A_d(G,B_{upper})$ = NO}
+    \State return NO
+\EndIf
+\State $B \leftarrow \left\lfloor{\frac{B_{upper} + B_{lower}}{2}} \right\rfloor $
+\While{true}
+    \If{$A_d(G,B)$ = YES}
+        \State $B_{upper} \leftarrow B$
+    \Else
+        \State $B_{lower} \leftarrow B+1$
+    \EndIf
+    \State $B \leftarrow \left\lfloor{\frac{B_{upper} + B_{lower}}{2}}\right\rfloor$
+    \If{$B_{lower} = B_{upper}$}
+        \State \textbf{break}
+    \EndIf
+\EndWhile
+\For{$i$ in $1\dots m$}
+    \If{$A_d((V,E\backslash \{e_i\}),B) = YES$}
+        \State $E \leftarrow E \backslash \{e_i\}$ 
+    \EndIf
+    \If{$|E| = n-1$}
+        \State return $E$
+    \EndIf
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\subsection*{Correctness}
+The first part of the algorithm simply binary searches for the correct $B$. After this step $B$ has the smallest possible value for our given $G$ and we now need to find the solution. To find the solution we use the same procedure as presented in the course for finding the solution for the MaximumClique problem.\\
+We go through each edge and try to remove it. If $A_d$ still answers YES it means that there still exists a solution and we can remove this edge. If $A_d$ answers NO we keep the current edge. We will now argue that this always finds a correct solution. When $|E| = n-1$ we return our solution $E$. 
+\subsubsection*{One solution}
+We will first look at the case where there only exists one solution in $G$. A solution to this problem is spanning tree which is a set of edges $ST$ and in this case there only exists one such set. We now look at an edge $e$. If $e\in ST$ and we remove it there no longer exists a solution in $G$ and $A_d$ answers NO and we keep $e$. If $e\notin ST$ we still have $ST \subseteq E$ and the solution still exists in $G$. $A_d$ will therefore answer YES and we can remove $e$ and still have a solution. As $G$ is finite we at some point will have removed all edges not in $ST$. This final $G$ is our solution as it is a spanning tree with edge set $ST$.
+
+\subsubsection*{Multiple solutions}
+We now assume there are multiple solutions $ST_1\dots ST_k$ present in $G$. We now look at an edge $e$. If $e$ is an all $ST_i$ and we remove it then $G$ no longer has any solutions and $A_d$ answers NO so we keep $e$. Thus we never remove all solutions from $G$. If $e$ is present in at least $ST_j$ but not present in at least $ST_i$ then removing it does not destroy all solutions. Therefore $G$ will still have at least the solution $ST_i$. Then $A_d$ would answer YES and we would have destroyed at least $ST_j$ and thus decreased the number of solutions. If $e$ is present in no solution then we of course can just remove like the case with one solution. Since each all the solutions are different then each $ST_i$ has at least one edge not present in all the other solutions. Therefore while there are more than one solution present in $G$ there will always be an edge which does not destroy all solutions which we can remove. Doing this iteratively we at some point only have one solutions present in $G$ and we know from before that in this case we will find the correct solution.
+
+\subsection*{Polynomial running time}
+We will now argue that the algorithm presented above runs in polynomial time. 
+
+Let $W=\sum_{i=1}^m w(e_i)$. First we binary search for the correct $B$ in the interval $[0,W]$. This takes $O(\log(W))$ time. However we know that $W \leq 2^{\|\mathbf{X}\|}$. So we get that this takes $O(\log(W)) = O(\log(2^{\| \mathbf{X}\|})) = O(\|\textbf{X}\|)$, so this step takes linear time. 
+For each edge we some constant time work and make a call to $A_d$, which we assume takes constant time. As a result this step takes $O(m)$ time. Since each edge is specified in the input we know $m \leq \|\textbf{X}\|$. So we finally get a running time of $O(\|\textbf{X}\| + m) = O(\|\textbf{X}\|)$ which means the algorithm $A_o$ runs in polynomial time.
+%For each edge we some constant time work and make a call to $A_d$, which we know is polynomial. As a result this step takes $O(m\cdot p(\|\textbf{X}\|))$. Since each edge is specified in the input we know $m \leq \|\textbf{X}\|$. So we finally get a running time of $O(\|\textbf{X}\| + \|\textbf{X}\|\cdot p(\|\textbf{X}\|)) = O(\|\textbf{X}\|\cdot p(\|\textbf{X}\|))$ and as the product of two polynomials is also a polynomial our algorithm runs in polynomial time.
